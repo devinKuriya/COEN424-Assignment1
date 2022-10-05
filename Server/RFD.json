@@ -1,0 +1,9 @@
+{
+"RFD":{
+    "ID":"123",
+    "LastBatchID":0,
+    "Samples":[1,2,3,4,5,6],
+    "DataAnalytics":0
+}
+
+}

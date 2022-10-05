@@ -1,0 +1,11 @@
+ with open('newfile.json', 'a+') as f:
+            data=json.load(f)
+            data["ID"]=id
+            data["BenchmarkType"]=BenchmarkType
+            data["WorkloadMetric"]=WorkloadMetric
+            data["BatchUnit"]=BatchUnit
+            data["BatchID"]=BatchID
+            data["BatchSize"]=BatchSize
+            data["DataType"]=DataType
+            data["DataAnalytics"]=DataAnalytics
+            print("JSON file updated")

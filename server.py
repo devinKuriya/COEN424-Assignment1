@@ -3,6 +3,7 @@
 #I certify that this is my own submission and meets Gina Cody School's expectation of Originality
 
 from http import client
+import json
 from multiprocessing.connection import wait
 import os
 import base64
@@ -20,11 +21,15 @@ while True:
     
     #HELP
     if mM!="":
-        print(mM)
         responsemessage="Message received"
         serverSocket.sendto(responsemessage.encode(),clientAddress)
-    
-
+        filename=mM
+        with open("Server/"+filename, 'w') as f:
+            data = serverSocket.recv(4096)
+            print(filename)
+            f.write(data.decode())
+            print(f.name+" has been downloaded successfully.")
+        
     #Not a valid command
     else:
         print("Not a valid message")
