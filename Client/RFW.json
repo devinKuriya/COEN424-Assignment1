@@ -1,12 +1,12 @@
 {
  "RFW": {
-  "ID": "77",
-  "BenchmarkType": "78",
-  "WorkloadMetric": "78",
-  "BatchUnit": "78",
-  "BatchID": "89",
-  "BatchSize": "98",
-  "DataType": "87",
-  "DataAnalytics": "78"
+  "ID": "11",
+  "BenchmarkType": "11",
+  "WorkloadMetric": "11",
+  "BatchUnit": "eed",
+  "BatchID": "11",
+  "BatchSize": "11",
+  "DataType": "eed",
+  "DataAnalytics": "11"
  }
 }

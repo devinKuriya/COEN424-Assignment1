@@ -5,10 +5,8 @@
 from http import client
 import json
 from multiprocessing.connection import wait
-import os
-import base64
-import time
 from socket import *
+import csv
 
 serverPort=12000
 serverSocket=socket(AF_INET,SOCK_DGRAM)
@@ -30,6 +28,31 @@ while True:
             f.write(data.decode())
             print(f.name+" has been downloaded successfully.")
         
+        #variable assignment
+        with open('Server/RFW.json', 'r') as file:
+            data=json.load(file)
+            id=data['RFW']["ID"]
+            BenchmarkType=data['RFW']["BenchmarkType"]
+            WorkloadMetric=data['RFW']["WorkloadMetric"]
+            BatchUnit=data['RFW']["BatchUnit"]
+            BatchID=data['RFW']["BatchID"]
+            BatchSize=data['RFW']["BatchSize"]
+            DataType=data['RFW']["DataType"]
+            DataAnalytics=data['RFW']["DataAnalytics"]
+        
+        #file processing
+        
+        filename='Server/'+BenchmarkType+'-'+WorkloadMetric
+        
+        with open('Server/'+filename) as csvfile:
+            csv_reader = csv.reader(csvfile, delimiter=',')
+
+
+        #Write to RFD.json
+
+        #Send RFD.json to client
+
+
     #Not a valid command
     else:
         print("Not a valid message")
