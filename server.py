@@ -7,7 +7,43 @@ import json
 from multiprocessing.connection import wait
 from socket import *
 import csv
-import statistics as stat
+import statistics
+
+def find_avg(samples):
+    length=len(samples)
+    sum=0
+    for x in samples:
+        sum+=int(x)
+    return sum/length
+
+def max_min(samples,options):
+    result=0
+    if(options==0):#min
+        for x in samples:
+            if(result>=int(x)):
+                result=int(x)
+        return result
+    elif(options==1):#max
+        for x in samples:
+            if(result<=int(x)):
+                result=int(x)
+        return result
+
+def find_std(samples):
+    #stat.stdev(data_samples)
+    length=len(samples)
+    intlist=[0]*length
+    count=0
+    for x in samples:
+        intlist[count]=int(x)
+    print(statistics.stdev(intlist))
+    return statistics.stdev(intlist)
+
+    
+
+        
+
+
 
 serverPort=12000
 serverSocket=socket(AF_INET,SOCK_DGRAM)
@@ -27,7 +63,6 @@ while True:
         filename=mM
         with open("Server/"+filename, 'w') as f:
             data = serverSocket.recv(4096)
-            print(filename)
             f.write(data.decode())
             print(f.name+" has been downloaded successfully.")
         
@@ -66,8 +101,6 @@ while True:
             line_count = 0
             for row in csv_reader:
                 if line_count<int(BatchUnit)*int(BatchSize):
-                    print(line_count)
-                    print(data_samples)
                     data_samples[line_count]=row[Colnum]
                     line_count+=1
                 else:
@@ -76,18 +109,19 @@ while True:
             print(str(data_samples))    
         #Calculate analytics
         originalds=data_samples
+        print(f'Unsorted: {data_samples}')
         data_samples.sort()
-        
+        print(f'Sorted: {data_samples}')        
 
         #####Fix it so lists give us integers
         if(DataAnalytics=="avg"):
-            data_analytic=sum(data_samples)/len(data_samples)
+            data_analytic=find_avg(data_samples)
         elif(DataAnalytics=="max"):
-            data_analytic=data_samples[len(data_samples)]
+            data_analytic=max_min(data_samples,1)
         elif(DataAnalytics=="min"):
-            data_analytic=data_samples[0]
+            data_analytic=max_min(data_samples,0)
         elif(DataAnalytics=="std"):
-            data_analytic= stat.stdev(data_samples)
+            data_analytic= find_std(data_samples)
 
         #Add percentile
 
@@ -96,8 +130,8 @@ while True:
             data = json.load(f)
             data['RFD']["ID"]=id
             data['RFD']["LastBatchID"]=last_batch_id
-            data['RFW']["DataSamples"]=data_samples
-            data['RFW']["DataAnalytic"]=data_analytic
+            data['RFD']["DataSamples"]=data_samples
+            data['RFD']["DataAnalytic"]=data_analytic
             print("JSON file updated")
             f.seek(0)        
             json.dump(data, f, indent=1)

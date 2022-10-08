@@ -1,9 +1,20 @@
 {
-"RFD":{
-    "ID":"123",
-    "LastBatchID":0,
-    "Samples":[1,2,3,4,5,6],
-    "DataAnalytics":0
-}
-
+ "RFD": {
+  "ID": "123",
+  "LastBatchID": 0,
+  "DataAnalytics": 0,
+  "DataSamples": [
+   "52",
+   "57",
+   "61",
+   "62",
+   "64",
+   "65",
+   "65",
+   "66",
+   "66",
+   "66"
+  ],
+  "DataAnalytic": 62.4
+ }
 }
