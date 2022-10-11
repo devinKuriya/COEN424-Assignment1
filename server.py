@@ -8,42 +8,51 @@ from multiprocessing.connection import wait
 from socket import *
 import csv
 import statistics
+import numpy as np
 
 def find_avg(samples):
     length=len(samples)
     sum=0
     for x in samples:
-        sum+=int(x)
+        sum+=np.double(x)
     return sum/length
 
 def max_min(samples,options):
-    result=0
+    result=np.double(samples[0])
     if(options==0):#min
         for x in samples:
-            if(result>=int(x)):
-                result=int(x)
+            if(result>=np.double(x)):
+                result=np.double(x)
         return result
     elif(options==1):#max
         for x in samples:
-            if(result<=int(x)):
-                result=int(x)
+            if(result<=np.double(x)):
+                result=np.double(x)
         return result
 
+def find_percentile(samples):
+    length=len(samples)
+    intlist=[0]*length
+    count=0
+    for x in samples:
+        intlist[count]=np.double(x)
+        count+=1
+    print(intlist)
+    print(f'Percentile:{np.percentile(intlist,np.double(data_analytic))}')
+    return np.percentile(intlist,np.double(data_analytic))
+
 def find_std(samples):
-    #stat.stdev(data_samples)
     length=len(samples)
     intlist=[0]*length
     count=0
     for x in samples:
         intlist[count]=int(x)
-    print(statistics.stdev(intlist))
-    return statistics.stdev(intlist)
-
+        count+=1
+    print(f'Standard Deviation:{np.std(intlist)}')
+    return np.std(intlist)
     
 
-        
-
-
+    
 
 serverPort=12000
 serverSocket=socket(AF_INET,SOCK_DGRAM)
@@ -58,8 +67,8 @@ while True:
     
     #HELP
     if mM!="":
-        responsemessage="Message received"
-        serverSocket.sendto(responsemessage.encode(),clientAddress)
+        #responsemessage="Message received"
+        #serverSocket.sendto(responsemessage.encode(),clientAddress)
         filename=mM
         with open("Server/"+filename, 'w') as f:
             data = serverSocket.recv(4096)
@@ -77,12 +86,14 @@ while True:
             BatchSize=data['RFW']["BatchSize"]
             DataType=data['RFW']["DataType"]
             DataAnalytics=data['RFW']["DataAnalytics"]
+            
+        file.close()
         
         #file processing
         
         filename=f'{BenchmarkType}-{DataType}.csv'
         
-        last_batch_id=0
+        last_batch_id=int(BatchID)+int(BatchUnit)
         data_samples=[0]*(int(BatchUnit)*int(BatchSize))
         data_analytic=0
 
@@ -98,13 +109,21 @@ while True:
 
         with open('Server/'+filename) as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',')
-            line_count = 0
+            line_count = (int(BatchUnit)*int(BatchSize))*(int(BatchID)-1)
+            count=0
+            rowcount=0
+            condition=((int(BatchUnit)*int(BatchSize)*int(BatchID)))
             for row in csv_reader:
-                if line_count<int(BatchUnit)*int(BatchSize):
-                    data_samples[line_count]=row[Colnum]
-                    line_count+=1
-                else:
-                    break
+                if rowcount==line_count:
+                    if line_count<condition:
+                        print(f'Before: {count}')
+                        data_samples[count]=np.double(row[Colnum])
+                        print(data_samples)
+                        line_count+=1
+                        count+=1
+                    else:
+                        break
+                rowcount+=1
             print(f'Lines processed: {line_count}')
             print(str(data_samples))    
         #Calculate analytics
@@ -122,16 +141,17 @@ while True:
             data_analytic=max_min(data_samples,0)
         elif(DataAnalytics=="std"):
             data_analytic= find_std(data_samples)
-
-        #Add percentile
-
+        else:
+            data_analytic=find_percentile(data_samples)
+        
+        
         #Write to RFD.json
         with open('Server/RFD.json', 'r+') as f:
             data = json.load(f)
             data['RFD']["ID"]=id
-            data['RFD']["LastBatchID"]=last_batch_id
+            data['RFD']["LastBatchID"]=str(last_batch_id)
             data['RFD']["DataSamples"]=data_samples
-            data['RFD']["DataAnalytic"]=data_analytic
+            data['RFD']["DataAnalytic"]=str(data_analytic)
             print("JSON file updated")
             f.seek(0)        
             json.dump(data, f, indent=1)
@@ -139,8 +159,8 @@ while True:
 
 
         #Send RFD.json to client
-        filename="RFW.json"
-        serverSocket.sendto(filename.encode(),clientAddress)
+        filename="RFD.json"
+        #serverSocket.sendto(filename.encode(),clientAddress)
         f = open("Server/"+filename,'rb')
         l = f.read(1024)
         while (l):

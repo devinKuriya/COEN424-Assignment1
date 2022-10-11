@@ -53,7 +53,8 @@ while True:
             print("JSON file updated")
             f.seek(0)        
             json.dump(data, f, indent=1)
-            f.truncate()     
+            f.truncate()  
+            f.close()   
         
         filename="RFW.json"
         if(fileexists_check("Client/"+filename)):
@@ -70,7 +71,12 @@ while True:
         print('Done sending')
 
         #Receive RFD.json
-
+        
+        if(True):
+            with open("Client/RFD.json", 'wb') as f:
+                data = clientSocket.recv(1024)
+                f.write(data)
+                print("RFD.json has been downloaded successfully.")
         #What to do with data?-->Put into file and aggreate all RFDs? Same for RFW?
    
 
