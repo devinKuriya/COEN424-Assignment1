@@ -2,11 +2,11 @@
  "RFW": {
   "ID": "12",
   "BenchmarkType": "DVD",
-  "WorkloadMetric": "MemoryUtilization_Average",
+  "WorkloadMetric": "CPUUtilization_Average",
   "BatchUnit": "2",
   "BatchID": "1",
   "BatchSize": "2",
   "DataType": "testing",
-  "DataAnalytics": "max"
+  "DataAnalytics": "50"
  }
 }

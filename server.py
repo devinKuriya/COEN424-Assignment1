@@ -30,16 +30,17 @@ def max_min(samples,options):
                 result=np.double(x)
         return result
 
-def find_percentile(samples):
+def find_percentile(samples,DA):
     length=len(samples)
     intlist=[0]*length
+    print(intlist)
     count=0
     for x in samples:
         intlist[count]=np.double(x)
         count+=1
     print(intlist)
-    print(f'Percentile:{np.percentile(intlist,np.double(data_analytic))}')
-    return np.percentile(intlist,np.double(data_analytic))
+    print(f'Percentile:{np.percentile(np.array(intlist),np.double(DA))}')
+    return np.percentile(np.array(intlist),int(DA))
 
 def find_std(samples):
     length=len(samples)
@@ -67,8 +68,6 @@ while True:
     
     #HELP
     if mM!="":
-        #responsemessage="Message received"
-        #serverSocket.sendto(responsemessage.encode(),clientAddress)
         filename=mM
         with open("Server/"+filename, 'w') as f:
             data = serverSocket.recv(4096)
@@ -142,7 +141,7 @@ while True:
         elif(DataAnalytics=="std"):
             data_analytic= find_std(data_samples)
         else:
-            data_analytic=find_percentile(data_samples)
+            data_analytic=find_percentile(data_samples,DataAnalytics)
         
         
         #Write to RFD.json
