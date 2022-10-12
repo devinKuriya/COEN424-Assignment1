@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+
+    message Rfw {
+        string ID = 1;
+        string BenchmarkType = 2;
+        string WorkloadMetric = 3;
+        string BatchUnit = 4;
+        string BatchID = 5;
+        string BatchSize = 6;
+        string DataType = 7;
+        string DataAnalytics = 8;
+    }

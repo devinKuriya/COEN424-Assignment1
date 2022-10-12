@@ -31,26 +31,12 @@ def max_min(samples,options):
         return result
 
 def find_percentile(samples,DA):
-    length=len(samples)
-    intlist=[0]*length
-    print(intlist)
-    count=0
-    for x in samples:
-        intlist[count]=np.double(x)
-        count+=1
-    print(intlist)
-    print(f'Percentile:{np.percentile(np.array(intlist),np.double(DA))}')
-    return np.percentile(np.array(intlist),int(DA))
+    samples.sort()
+    return np.percentile(np.array(np.double(samples)),int(DA))
 
-def find_std(samples):
-    length=len(samples)
-    intlist=[0]*length
-    count=0
-    for x in samples:
-        intlist[count]=int(x)
-        count+=1
-    print(f'Standard Deviation:{np.std(intlist)}')
-    return np.std(intlist)
+def find_std(samples):#Finding as if samples were the population
+    samples.sort()
+    return np.std(np.double(samples))
     
 
     
@@ -66,8 +52,9 @@ while True:
     message,clientAddress=serverSocket.recvfrom(2048)
     mM=message.decode()
     
-    #HELP
+    #
     if mM!="":
+
         filename=mM
         with open("Server/"+filename, 'w') as f:
             data = serverSocket.recv(4096)
@@ -92,7 +79,7 @@ while True:
         
         filename=f'{BenchmarkType}-{DataType}.csv'
         
-        last_batch_id=int(BatchID)+int(BatchUnit)
+        last_batch_id=int(BatchID)+int(BatchSize)-1
         data_samples=[0]*(int(BatchUnit)*int(BatchSize))
         data_analytic=0
 
@@ -126,10 +113,7 @@ while True:
             print(f'Lines processed: {line_count}')
             print(str(data_samples))    
         #Calculate analytics
-        originalds=data_samples
-        print(f'Unsorted: {data_samples}')
-        data_samples.sort()
-        print(f'Sorted: {data_samples}')        
+              
 
         #####Fix it so lists give us integers
         if(DataAnalytics=="avg"):
@@ -161,11 +145,11 @@ while True:
         filename="RFD.json"
         #serverSocket.sendto(filename.encode(),clientAddress)
         f = open("Server/"+filename,'rb')
-        l = f.read(1024)
+        l = f.read(2048)
         while (l):
             serverSocket.sendto(l,clientAddress)
             print('Sending...')
-            l = f.read(1024)
+            l = f.read(2048)
         f.close()
         print('Done sending')
 

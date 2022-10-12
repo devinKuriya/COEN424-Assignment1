@@ -9,6 +9,7 @@ from socket import *
 import os
 import time
 import json
+import pb_RFW_pb2 as PBRFW
 
 
 
@@ -41,43 +42,32 @@ while True:
     if(id==""):
         break
     else:
-        with open('Client/RFW.json', 'r+') as f:
-            data = json.load(f)
-            data['RFW']["ID"]=id
-            data['RFW']["BenchmarkType"]=BenchmarkType
-            data['RFW']["WorkloadMetric"]=WorkloadMetric
-            data['RFW']["BatchUnit"]=BatchUnit
-            data['RFW']["BatchID"]=BatchID
-            data['RFW']["BatchSize"]=BatchSize
-            data['RFW']["DataType"]=DataType
-            data['RFW']["DataAnalytics"]=DataAnalytics
-            print("JSON file updated")
-            f.seek(0)        
-            json.dump(data, f, indent=1)
-            f.truncate()  
-            f.close()   
+        test = PBRFW._RFW
+        test.ID=id
+        test.BenchmarkType=BenchmarkType
+        test.WorkloadMetric=WorkloadMetric
+        test.BatchUnit=BatchUnit
+        test.BatchID=BatchID
+        test.BatchSize=BatchSize
+        test.DataType=DataType
+        test.DataAnalytics=DataAnalytics
         
-        filename="RFW.json"
-        if(fileexists_check("Client/"+filename)):
-            requestmessage=f"{str(filename)}"
-
-        clientSocket.sendto(requestmessage.encode(),(serverName,serverPort))
-        f = open("Client/"+filename,'rb')
-        l = f.read(1024)
-        while (l):
-            clientSocket.sendto(l,(serverName,serverPort))
-            print('Sent')
-            l = f.read(1024)
-        f.close()
-        print('Done sending')
-
-        #Receive RFD.json
+        print(test.ID)
+        print(test.BenchmarkType)
+        print(test.WorkloadMetric)
+        print(test.BatchUnit)
+        print(test.BatchSize)
+        print(test.DataType)
+        print(test.DataAnalytics)
         
-        if(True):
-            with open("Client/RFD.json", 'wb') as f:
-                data = clientSocket.recv(2048)
-                f.write(data)
-                print("RFD.json has been downloaded successfully.")
+        #Send protobuf file
+        clientSocket.sendto(test,(serverName,serverPort))  #SOmething wrong here
+        #Receive RFW protobuf file
+        
+
+
+
+        
         #What to do with data?-->Put into file and aggreate all RFDs? Same for RFW?
    
 
