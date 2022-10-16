@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+    message Rfd {
+        string ID = 1;
+        string LastBatchID = 2;
+        repeated double DataSamples = 3 [packed=true];
+        string DataAnalytic = 4;
+    }

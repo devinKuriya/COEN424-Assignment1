@@ -9,7 +9,9 @@ from socket import *
 import os
 import time
 import json
-import pb_RFW_pb2 as PBRFW
+import RFW_pb2
+import RFD_pb2
+import struct
 
 
 
@@ -42,7 +44,7 @@ while True:
     if(id==""):
         break
     else:
-        test = PBRFW._RFW
+        test = RFW_pb2.Rfw()
         test.ID=id
         test.BenchmarkType=BenchmarkType
         test.WorkloadMetric=WorkloadMetric
@@ -51,23 +53,16 @@ while True:
         test.BatchSize=BatchSize
         test.DataType=DataType
         test.DataAnalytics=DataAnalytics
-        
-        print(test.ID)
-        print(test.BenchmarkType)
-        print(test.WorkloadMetric)
-        print(test.BatchUnit)
-        print(test.BatchSize)
-        print(test.DataType)
-        print(test.DataAnalytics)
-        
+
         #Send protobuf file
-        clientSocket.sendto(test,(serverName,serverPort))  #SOmething wrong here
+        clientSocket.sendto(test.SerializeToString(),(serverName,serverPort))
+       
         #Receive RFW protobuf file
-        
+        message=clientSocket.recv(2048)
 
-
-
-        
+        RFD = RFD_pb2.Rfd()
+        RFD.ParseFromString(message)
+        print(RFD)
         #What to do with data?-->Put into file and aggreate all RFDs? Same for RFW?
    
 

@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-
     message Rfw {
         string ID = 1;
         string BenchmarkType = 2;

@@ -7,7 +7,6 @@ import json
 from multiprocessing.connection import wait
 from socket import *
 import csv
-import statistics
 import numpy as np
 
 def find_avg(samples):
