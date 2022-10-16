@@ -1,14 +1,11 @@
 {
  "RFD": {
-  "ID": "12",
-  "LastBatchID": "5",
+  "ID": "11",
+  "LastBatchID": "3",
   "DataSamples": [
-   62.0,
-   65.0,
    66.0,
-   66.0,
-   66.0
+   65.0
   ],
-  "DataAnalytic": "65.0"
+  "DataAnalytic": "65.77"
  }
 }

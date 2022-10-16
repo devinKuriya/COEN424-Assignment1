@@ -7,6 +7,7 @@ import json
 from multiprocessing.connection import wait
 from socket import *
 import csv
+from xml.etree.ElementPath import find
 import numpy as np
 import RFW_pb2
 import RFD_pb2
@@ -33,7 +34,13 @@ def max_min(samples,options):
 
 def find_percentile(samples,DA):
     samples.sort()
-    return np.percentile(np.array(np.double(samples)),int(DA))
+    temp=list(DA)
+    temp2=''
+    p = temp.index("p")  # find position of the letter "a"
+    del(temp[p])
+    for element in temp: 
+        temp2 += str(element)
+    return np.percentile(np.array(np.double(samples)),int(temp2))
 
 def find_std(samples):#Finding as if samples were the population
     samples.sort()
@@ -117,16 +124,21 @@ while True:
             for row in csv_reader:
                 if rowcount==line_count:
                     if line_count<condition:
-                        print(f'Before: {count}')
                         data_samples[count]=np.double(row[Colnum])
-                        print(data_samples)
                         line_count+=1
                         count+=1
                     else:
                         break
                 rowcount+=1
-            print(f'Lines processed: {line_count}')
-            print(str(data_samples))    
+            print(f'Lines processed: {line_count}') 
+            
+            counter=0
+            d1=[0]*(len(data_samples))
+            for x in data_samples:
+                d1[counter]=data_samples[counter]
+                counter+=1
+            
+
         #Calculate analytics
               
 
@@ -148,7 +160,7 @@ while True:
                 data = json.load(f)
                 data['RFD']["ID"]=id
                 data['RFD']["LastBatchID"]=str(last_batch_id)
-                data['RFD']["DataSamples"]=data_samples
+                data['RFD']["DataSamples"]=d1
                 data['RFD']["DataAnalytic"]=str(data_analytic)
                 print("JSON file updated")
                 f.seek(0)        
@@ -172,7 +184,7 @@ while True:
             RFD = RFD_pb2.Rfd()
             RFD.ID=id
             RFD.LastBatchID=str(last_batch_id)
-            RFD.DataSamples.extend(data_samples)
+            RFD.DataSamples.extend(d1)
             RFD.DataAnalytic=str(data_analytic)
 
             #Send back to client
