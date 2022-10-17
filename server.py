@@ -49,7 +49,7 @@ def find_std(samples):#Finding as if samples were the population
     
 
     
-
+#Socket binding
 serverPort=12000
 serverSocket=socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort))
@@ -58,14 +58,14 @@ serverSocket.listen(1)
 
 
 print('Server ready to receive on port:'+str(serverPort))
-while True:
+while True:#Server will run till manually closed
     clientconnection,clientAddress=serverSocket.accept()
     temporaray=clientconnection.recv(2048)
     format=temporaray.decode('latin-1')
     print(format)
     request=clientconnection.recv(1000000000)
    
-    #
+    #Check request is not empty
     if len(request)!="":
         if(format=="j"):
             #variable assignment
