@@ -1,0 +1,11 @@
+{
+ "RFD": {
+  "ID": "11",
+  "LastBatchID": "3",
+  "DataSamples": [
+   66.0,
+   65.0
+  ],
+  "DataAnalytic": "65.77"
+ }
+}
