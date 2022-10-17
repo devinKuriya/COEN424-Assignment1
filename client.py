@@ -68,11 +68,11 @@ while True:
 
             clientSocket.sendto(requestmessage.encode(),(serverName,serverPort))
             f = open("Client/"+filename,'rb')
-            l = f.read(1024)
+            l = f.read(2048)
             while (l):
                 clientSocket.sendto(l,(serverName,serverPort))
                 print('Sent')
-                l = f.read(1024)
+                l = f.read(2048)
             f.close()
             print('Done sending')
         else:
@@ -93,12 +93,12 @@ while True:
         #Receive RFD
         
         if(format=="j"):
-            with open("Client/RFD.json", 'wb') as f:
-                data = clientSocket.recv(2048)
-                f.write(data)
+            with open("Client/RFD.json", 'w') as f:
+                data = clientSocket.recv(1000000000)
+                f.write(data.decode())
                 print("RFD.json has been downloaded successfully.")
         else:
-            message=clientSocket.recv(2048)
+            message=clientSocket.recv(1000000000)
             RFD = RFD_pb2.Rfd()
             RFD.ParseFromString(message)
             print(RFD)

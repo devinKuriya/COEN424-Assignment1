@@ -7,6 +7,7 @@ import json
 from multiprocessing.connection import wait
 from socket import *
 import csv
+from urllib import response
 from xml.etree.ElementPath import find
 import numpy as np
 import RFW_pb2
@@ -57,20 +58,20 @@ space=" "
 
 print('Server ready to receive on port:'+str(serverPort))
 while True:
-    f,clientAddress=serverSocket.recvfrom(2048)
+    f,clientAddress=serverSocket.recvfrom(1000000000)
     format=f.decode()
 
-    message,clientAddress=serverSocket.recvfrom(2048)
+    message,clientAddress=serverSocket.recvfrom(1000000000)
     mM=message.decode()
     
     #
-    if mM!="":
+    if len(mM)!="":
         if(format=="j"):
             with open("Server/RFW.json", 'w') as f:
-                data = serverSocket.recv(4096)
+                data = serverSocket.recv(1000000000)
                 f.write(data.decode())
                 print(f.name+" has been downloaded successfully.")
-            
+            f.close()
             #variable assignment
             with open('Server/RFW.json', 'r') as file:
                 data=json.load(file)
@@ -138,9 +139,7 @@ while True:
                 d1[counter]=data_samples[counter]
                 counter+=1
             
-
-        #Calculate analytics
-              
+  
 
         #####Fix it so lists give us integers
         if(DataAnalytics=="avg"):
@@ -156,29 +155,17 @@ while True:
         
         if(format=="j"):
             #Write to RFD.json
-            with open('Server/RFD.json', 'r+') as f:
-                data = json.load(f)
-                data['RFD']["ID"]=id
-                data['RFD']["LastBatchID"]=str(last_batch_id)
-                data['RFD']["DataSamples"]=d1
-                data['RFD']["DataAnalytic"]=str(data_analytic)
-                print("JSON file updated")
-                f.seek(0)        
-                json.dump(data, f, indent=1)
-                f.truncate()     
+           JSONresponse = {
+                "ID":id,
+                "LastBatchID":last_batch_id,
+                "DataSamples":d1,
+                "DataAnalytic":data_analytic
+           }
+           responsemessage=json.dumps(JSONresponse)
+           encodedmessage=responsemessage.encode('latin-1')
 
-
-            #Send RFD.json to client
-            filename="RFD.json"
-            #serverSocket.sendto(filename.encode(),clientAddress)
-            f = open("Server/"+filename,'rb')
-            l = f.read(2048)
-            while (l):
-                serverSocket.sendto(l,clientAddress)
-                print('Sending...')
-                l = f.read(2048)
-            f.close()
-            print('Done sending')
+           serverSocket.sendto(encodedmessage,clientAddress) 
+            
         else:
             #Set Values for RFD
             RFD = RFD_pb2.Rfd()
@@ -200,8 +187,5 @@ while True:
     
            
         
-   
-    
-    
-    
+
 
