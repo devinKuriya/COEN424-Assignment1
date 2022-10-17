@@ -51,43 +51,40 @@ def find_std(samples):#Finding as if samples were the population
     
 
 serverPort=12000
-serverSocket=socket(AF_INET,SOCK_DGRAM)
+serverSocket=socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort))
-space=" "
+serverSocket.listen(1)
+
 
 
 print('Server ready to receive on port:'+str(serverPort))
 while True:
-    f,clientAddress=serverSocket.recvfrom(1000000000)
-    format=f.decode()
-
-    message,clientAddress=serverSocket.recvfrom(1000000000)
-    mM=message.decode()
-    
+    clientconnection,clientAddress=serverSocket.accept()
+    temporaray=clientconnection.recv(2048)
+    format=temporaray.decode('latin-1')
+    print(format)
+    request=clientconnection.recv(1000000000)
+   
     #
-    if len(mM)!="":
+    if len(request)!="":
         if(format=="j"):
-            with open("Server/RFW.json", 'w') as f:
-                data = serverSocket.recv(1000000000)
-                f.write(data.decode())
-                print(f.name+" has been downloaded successfully.")
-            f.close()
             #variable assignment
-            with open('Server/RFW.json', 'r') as file:
-                data=json.load(file)
-                id=data['RFW']["ID"]
-                BenchmarkType=data['RFW']["BenchmarkType"]
-                WorkloadMetric=data['RFW']["WorkloadMetric"]
-                BatchUnit=data['RFW']["BatchUnit"]
-                BatchID=data['RFW']["BatchID"]
-                BatchSize=data['RFW']["BatchSize"]
-                DataType=data['RFW']["DataType"]
-                DataAnalytics=data['RFW']["DataAnalytics"]
-                
+            data=json.loads(request)
+            id=data["ID"]
+            BenchmarkType=data["BenchmarkType"]
+            WorkloadMetric=data["WorkloadMetric"]
+            BatchUnit=data["BatchUnit"]
+            BatchID=data["BatchID"]
+            BatchSize=data["BatchSize"]
+            DataType=data["DataType"]
+            DataAnalytics=data["DataAnalytics"]
+            with open("Server/RFW.json", 'w') as file:
+               json.dump(data,file,indent=1)
             file.close()
         else:
             test = RFW_pb2.Rfw()
-            test.ParseFromString(message)
+            test.ParseFromString(request)
+            print(test)
             #variable assignment
             id=test.ID
             BenchmarkType=test.BenchmarkType
@@ -161,10 +158,11 @@ while True:
                 "DataSamples":d1,
                 "DataAnalytic":data_analytic
            }
+           print(JSONresponse)
            responsemessage=json.dumps(JSONresponse)
-           encodedmessage=responsemessage.encode('latin-1')
-
-           serverSocket.sendto(encodedmessage,clientAddress) 
+           encodedresponse=responsemessage.encode('latin-1')
+           clientconnection.send(encodedresponse)
+           
             
         else:
             #Set Values for RFD
@@ -175,14 +173,15 @@ while True:
             RFD.DataAnalytic=str(data_analytic)
 
             #Send back to client
-            serverSocket.sendto(RFD.SerializeToString(),clientAddress)
+            encoded=RFD.SerializeToString()
+            clientconnection.send(encoded)
             print('Message Sent!')
 
     #Not a valid command
     else:
         print("Not a valid message")
-        print(mM)
-        serverSocket.sendto("Not a valid message".encode(),clientAddress)
+        print(request)
+        clientconnection.sendto("Not a valid message".encode(),clientAddress)
     
     
            

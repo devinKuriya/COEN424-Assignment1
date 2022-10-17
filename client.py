@@ -25,12 +25,13 @@ def fileexists_check(path):
 
 serverName='localhost'
 serverPort=12000
-clientSocket=socket(AF_INET,SOCK_DGRAM)
+clientSocket=socket(AF_INET,SOCK_STREAM)
+clientSocket.connect((serverName,serverPort))
 
 #User inputs commands forever until bye command is used to break connection
 while True:
     format=input('Message format Protobuff(p) or JSON(j): \n')
-    clientSocket.sendto(format.encode(),(serverName,serverPort))
+    clientSocket.send(format.encode())
     print("**********Inputs BenchmarkType and DataType are case sensitive. Copy one of the two options given**********")
     id=input('Please input an ID(if you wish to close client click enter): \n')
     BenchmarkType=input('Please input a BenchmarkType(DVD or NDBench): \n')
@@ -46,35 +47,24 @@ while True:
     else:
         if(format=="j"):
             #Send as JSON file
-            with open('Client/RFW.json', 'r+') as f:
-                data = json.load(f)
-                data['RFW']["ID"]=id
-                data['RFW']["BenchmarkType"]=BenchmarkType
-                data['RFW']["WorkloadMetric"]=WorkloadMetric
-                data['RFW']["BatchUnit"]=BatchUnit
-                data['RFW']["BatchID"]=BatchID
-                data['RFW']["BatchSize"]=BatchSize
-                data['RFW']["DataType"]=DataType
-                data['RFW']["DataAnalytics"]=DataAnalytics
-                print("JSON file updated")
-                f.seek(0)        
-                json.dump(data, f, indent=1)
-                f.truncate()  
-                f.close()   
-            
-            filename="RFW.json"
-            if(fileexists_check("Client/"+filename)):
-                requestmessage=f"{str(filename)}"
-
-            clientSocket.sendto(requestmessage.encode(),(serverName,serverPort))
-            f = open("Client/"+filename,'rb')
-            l = f.read(2048)
-            while (l):
-                clientSocket.sendto(l,(serverName,serverPort))
-                print('Sent')
-                l = f.read(2048)
-            f.close()
-            print('Done sending')
+            JSONrequest = {
+            "ID":id,
+            "BenchmarkType":BenchmarkType,
+            "WorkloadMetric":WorkloadMetric,
+            "BatchUnit":BatchUnit,
+            "BatchID":BatchID,
+            "BatchSize":BatchSize,
+            "DataType":DataType,
+            "DataAnalytics":DataAnalytics
+            }
+            print(JSONrequest)
+            requestmessage=json.dumps(JSONrequest)
+            encoded=requestmessage.encode('latin-1')
+            clientSocket.send(encoded)
+            print("Done sending")
+            with open("Client/RFW.json", 'w') as file:
+               json.dump(JSONrequest,file,indent=1)
+            file.close()
         else:
             #Set protobuf object
             test = RFW_pb2.Rfw()
@@ -87,15 +77,16 @@ while True:
             test.DataType=DataType
             test.DataAnalytics=DataAnalytics
             #Send protobuf file
-            clientSocket.sendto(test.SerializeToString(),(serverName,serverPort))
+            temp=test.SerializeToString()
+            clientSocket.send(temp)
             
 
         #Receive RFD
         
         if(format=="j"):
+            data = clientSocket.recv(1000000000)
             with open("Client/RFD.json", 'w') as f:
-                data = clientSocket.recv(1000000000)
-                f.write(data.decode())
+                f.write(data.decode('latin-1'))
                 print("RFD.json has been downloaded successfully.")
         else:
             message=clientSocket.recv(1000000000)
