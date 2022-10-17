@@ -1,0 +1,6 @@
+ID: "123"
+LastBatchID: "2"
+DataSamples: 66.0
+DataSamples: 66.0
+DataSamples: 65.0
+DataAnalytic: "65.66666666666667"

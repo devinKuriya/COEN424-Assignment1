@@ -77,6 +77,8 @@ while True:
             test.DataType=DataType
             test.DataAnalytics=DataAnalytics
             #Send protobuf file
+            with open("Client/RFWproto.txt", 'w') as f:
+                f.write(str(test))
             temp=test.SerializeToString()
             clientSocket.send(temp)
             
@@ -87,13 +89,15 @@ while True:
             data = clientSocket.recv(1000000000)
             with open("Client/RFD.json", 'w') as f:
                 f.write(data.decode('latin-1'))
-                print("RFD.json has been downloaded successfully.")
+            print("RFD.json has been downloaded successfully.")
         else:
             message=clientSocket.recv(1000000000)
             RFD = RFD_pb2.Rfd()
             RFD.ParseFromString(message)
+            with open("Client/RFDproto.txt", 'w') as f:
+                f.write(str(RFD))
             print(RFD)
-        #What to do with data?-->Put into file and aggreate all RFDs? Same for RFW?
+        
    
 
 

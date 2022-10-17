@@ -1,0 +1,8 @@
+ID: "123"
+BenchmarkType: "DVD"
+WorkloadMetric: "CPUUtilization_Average"
+BatchUnit: "3"
+BatchID: "2"
+BatchSize: "1"
+DataType: "testing"
+DataAnalytics: "avg"

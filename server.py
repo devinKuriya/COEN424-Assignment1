@@ -10,6 +10,7 @@ import csv
 from urllib import response
 from xml.etree.ElementPath import find
 import numpy as np
+from pyparsing import line
 import RFW_pb2
 import RFD_pb2
 
@@ -94,12 +95,13 @@ while True:#Server will run till manually closed
             BatchSize=test.BatchSize
             DataType=test.DataType
             DataAnalytics=test.DataAnalytics
-        
+            with open("Server/RFWproto.txt", 'w') as f:
+                f.write(str(test))
         #file processing
         
         filename=f'{BenchmarkType}-{DataType}.csv'
         
-        last_batch_id=int(BatchID)+int(BatchSize)-1
+        last_batch_id=(int(BatchID)+int(BatchSize))-1
         data_samples=[0]*(int(BatchUnit)*int(BatchSize))
         data_analytic=0
 
@@ -115,13 +117,16 @@ while True:#Server will run till manually closed
 
         with open('Server/'+filename) as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',')
-            line_count = (int(BatchUnit)*int(BatchSize))*(int(BatchID)-1)
+            #line_count = (int(BatchUnit)*int(BatchSize))*((int(BatchID)-1))
+            line_count = (int(BatchUnit)*(int(BatchID)-1))
+            print(f'Line count first:{line_count}')
             count=0
             rowcount=0
-            condition=((int(BatchUnit)*int(BatchSize)*int(BatchID)))
+            #condition=((int(BatchUnit)*int(BatchSize)*int(BatchID)))
+            condition=(int(BatchUnit)*int(BatchSize))+line_count-1
             for row in csv_reader:
                 if rowcount==line_count:
-                    if line_count<condition:
+                    if line_count<=condition:
                         data_samples[count]=np.double(row[Colnum])
                         line_count+=1
                         count+=1
@@ -160,6 +165,9 @@ while True:#Server will run till manually closed
            }
            print(JSONresponse)
            responsemessage=json.dumps(JSONresponse)
+           with open("Server/RFD.json", 'w') as file:
+               file.write(responsemessage)
+           file.close()
            encodedresponse=responsemessage.encode('latin-1')
            clientconnection.send(encodedresponse)
            
@@ -171,8 +179,9 @@ while True:#Server will run till manually closed
             RFD.LastBatchID=str(last_batch_id)
             RFD.DataSamples.extend(d1)
             RFD.DataAnalytic=str(data_analytic)
-
             #Send back to client
+            with open("Server/RFDproto.txt", 'w') as f:
+                f.write(str(RFD))
             encoded=RFD.SerializeToString()
             clientconnection.send(encoded)
             print('Message Sent!')
