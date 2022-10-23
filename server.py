@@ -63,11 +63,14 @@ while True:#Server will run till manually closed
     clientconnection,clientAddress=serverSocket.accept()
     temporaray=clientconnection.recv(2048)
     format=temporaray.decode('latin-1')
-    print(format)
+    if(format=="j"):
+        print("JSON selected")
+    else:
+        print("Protobuf selected")
     request=clientconnection.recv(1000000000)
    
     #Check request is not empty
-    if len(request)!="":
+    if len(request)!=0:
         if(format=="j"):
             #variable assignment
             data=json.loads(request)
@@ -189,7 +192,7 @@ while True:#Server will run till manually closed
     #Not a valid command
     else:
         print("Not a valid message")
-        print(request)
+        print(request.decode())
         clientconnection.sendto("Not a valid message".encode(),clientAddress)
     
     
