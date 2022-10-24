@@ -14,14 +14,14 @@ from pyparsing import line
 import RFW_pb2
 import RFD_pb2
 
-def find_avg(samples):
+def find_avg(samples):#USed to find average
     length=len(samples)
     sum=0
     for x in samples:
         sum+=np.double(x)
     return sum/length
 
-def max_min(samples,options):
+def max_min(samples,options):#Used to find max/min values
     result=np.double(samples[0])
     if(options==0):#min
         for x in samples:
@@ -34,18 +34,18 @@ def max_min(samples,options):
                 result=np.double(x)
         return result
 
-def find_percentile(samples,DA):
-    samples.sort()
+def find_percentile(samples,DA):#Used to find percentile value
+    samples.sort()#Need a sorted array
     temp=list(DA)
     temp2=''
-    p = temp.index("p")  # find position of the letter "a"
+    p = temp.index("p")  #find position of the letter "p"
     del(temp[p])
     for element in temp: 
         temp2 += str(element)
     return np.percentile(np.array(np.double(samples)),int(temp2))
 
 def find_std(samples):#Finding as if samples were the population
-    samples.sort()
+    samples.sort()#Need a sorted array
     return np.std(np.double(samples))
     
 
@@ -64,6 +64,7 @@ while True:#Server will run till manually closed
     clientconnection,clientAddress=serverSocket.accept()
     temporaray=clientconnection.recv(2048)
     format=temporaray.decode('latin-1')
+    #Check what type to use
     if(format=="j"):
         print("JSON selected")
     else:
@@ -83,6 +84,7 @@ while True:#Server will run till manually closed
             BatchSize=data["BatchSize"]
             DataType=data["DataType"]
             DataAnalytics=data["DataAnalytics"]
+            #Save request to json file
             with open("Server/RFW.json", 'w') as file:
                json.dump(data,file,indent=1)
             file.close()
@@ -99,16 +101,17 @@ while True:#Server will run till manually closed
             BatchSize=test.BatchSize
             DataType=test.DataType
             DataAnalytics=test.DataAnalytics
+            #save request to txt file
             with open("Server/RFWproto.txt", 'w') as f:
                 f.write(str(test))
         #file processing
-        
-        filename=f'{BenchmarkType}-{DataType}.csv'
+        filename=f'{BenchmarkType}-{DataType}.csv'#Get file name from which to take data
         
         last_batch_id=(int(BatchID)+int(BatchSize))-1
         data_samples=[0]*(int(BatchUnit)*int(BatchSize))
-        data_analytic=0
+        data_analytic=0#Set value
 
+        #Get which column to get data from
         if(WorkloadMetric=="CPUUtilization_Average"):
             Colnum=0
         elif(WorkloadMetric=="NetworkIn_Average"):
@@ -118,7 +121,7 @@ while True:#Server will run till manually closed
         elif(WorkloadMetric=="MemoryUtilization_Average"):
             Colnum=3
 
-
+        #open file and get data
         with open('Server/'+filename) as csvfile:
             csv_reader = csv.reader(csvfile, delimiter=',')
             #line_count = (int(BatchUnit)*int(BatchSize))*((int(BatchID)-1))
@@ -141,13 +144,14 @@ while True:#Server will run till manually closed
             
             counter=0
             d1=[0]*(len(data_samples))
+            #save data samples in temp array since when sort is used, it gets out of order
             for x in data_samples:
                 d1[counter]=data_samples[counter]
                 counter+=1
             
   
 
-        #####Fix it so lists give us integers
+        #Get analytic values
         if(DataAnalytics=="avg"):
             data_analytic=find_avg(data_samples)
         elif(DataAnalytics=="max"):
@@ -183,6 +187,7 @@ while True:#Server will run till manually closed
             RFD.LastBatchID=str(last_batch_id)
             RFD.DataSamples.extend(d1)
             RFD.DataAnalytic=str(data_analytic)
+            
             #Send back to client
             with open("Server/RFDproto.txt", 'w') as f:
                 f.write(str(RFD))
@@ -190,7 +195,7 @@ while True:#Server will run till manually closed
             clientconnection.send(encoded)
             print('Message Sent!')
 
-    #Not a valid command
+    #Not a valid command(empty command)
     else:
         print("Not a valid message")
         print(request.decode())
