@@ -51,9 +51,10 @@ def find_std(samples):#Finding as if samples were the population
 
     
 #Socket binding
-serverPort=12000
+serverPort=1200
+host = ''
 serverSocket=socket(AF_INET,SOCK_STREAM)
-serverSocket.bind(('',serverPort))
+serverSocket.bind((host,serverPort))
 serverSocket.listen(1)
 
 

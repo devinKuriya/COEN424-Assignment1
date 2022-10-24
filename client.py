@@ -13,6 +13,7 @@ import RFD_pb2
 
 
 
+
 def fileexists_check(path):
         if os.path.isfile(path)!=True:
             return False
@@ -24,7 +25,7 @@ def fileexists_check(path):
 #userInput_PortNumber=input('Please input a port number(12000): \n')
 
 serverName='localhost'
-serverPort=12000
+serverPort=1200
 clientSocket=socket(AF_INET,SOCK_STREAM)
 clientSocket.connect((serverName,serverPort))
 
@@ -90,11 +91,13 @@ while True:
             with open("Client/RFD.json", 'w') as f:
                 f.write(data.decode('latin-1'))
             print("RFD.json has been downloaded successfully.")
+
         else:
             message=clientSocket.recv(1000000000)
             RFD = RFD_pb2.Rfd()
             RFD.ParseFromString(message)
-            with open("Client/RFDproto.txt", 'w') as f:
+            with open("Client/RFDproto.txt", 'a') as f:
+                f.write('\n')
                 f.write(str(RFD))
             print(RFD)
         

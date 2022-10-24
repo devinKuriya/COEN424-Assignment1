@@ -1,10 +1,10 @@
 {
- "ID": "12",
+ "ID": "1",
  "BenchmarkType": "DVD",
  "WorkloadMetric": "CPUUtilization_Average",
- "BatchUnit": "2",
- "BatchID": "2",
- "BatchSize": "10",
+ "BatchUnit": "12",
+ "BatchID": "1",
+ "BatchSize": "1",
  "DataType": "testing",
  "DataAnalytics": "avg"
 }
