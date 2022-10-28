@@ -1,12 +1,1 @@
-ID: "123"
-LastBatchID: "2"
-DataSamples: 66.0
-DataSamples: 66.0
-DataSamples: 65.0
-DataAnalytic: "65.66666666666667"
 
-ID: "12"
-LastBatchID: "1"
-DataSamples: 62.0
-DataSamples: 65.0
-DataAnalytic: "63.5"

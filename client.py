@@ -80,7 +80,7 @@ while(request==0):
             test.DataType=DataType
             test.DataAnalytics=DataAnalytics
             
-            #Send protobuf file
+            #Save and Send protobuf file
             with open("Client/RFWproto.txt", 'w') as f:
                 f.write(str(test))
             temp=test.SerializeToString()
